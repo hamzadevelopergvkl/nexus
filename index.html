@@ -1,0 +1,3046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus AI - Legendary Interface</title>
+    <style>
+        :root {
+            --primary: #6e00ff;
+            --secondary: #00f0ff;
+            --dark: #0a0a12;
+            --darker: #050508;
+            --text: #e0e0ff;
+            --accent: #ff00aa;
+            --success: #00ff55;
+            --warning: #ffaa00;
+            --error: #ff0033;
+            --container-bg: rgba(20, 20, 30, 0.7);
+            --input-bg: rgba(15, 15, 25, 0.5);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --translation-bg: rgba(15, 15, 25, 0.5);
+        }
+        
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) var(--darker);
+        }
+        
+        /* Custom scrollbar for WebKit browsers */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--darker);
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--darker);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .app-container {
+            display: flex;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Animated background elements */
+        .bg-element {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+            filter: blur(60px);
+            z-index: 0;
+        }
+        
+        .bg-1 {
+            width: 300px;
+            height: 300px;
+            background: var(--primary);
+            top: -100px;
+            left: -100px;
+            animation: float 15s infinite alternate ease-in-out;
+        }
+        
+        .bg-2 {
+            width: 500px;
+            height: 500px;
+            background: var(--secondary);
+            bottom: -200px;
+            right: -200px;
+            animation: float 20s infinite alternate-reverse ease-in-out;
+        }
+        
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(50px, 50px); }
+            100% { transform: translate(-50px, -50px); }
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: rgba(10, 10, 20, 0.9);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            padding-top: 30px;
+            z-index: 2;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+            width: 0;
+            opacity: 0;
+        }
+        
+        .nav-item {
+            width: calc(100% - 40px);
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            cursor: pointer;
+            position: relative;
+            color: var(--text);
+            text-decoration: none;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .nav-item:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .nav-item.active {
+            opacity: 1;
+            background: linear-gradient(90deg, rgba(110, 0, 255, 0.2), transparent);
+            border-left: 3px solid var(--primary);
+        }
+        
+        .nav-item i {
+            font-size: 20px;
+            margin-right: 15px;
+            min-width: 20px;
+        }
+        
+        .nav-item span {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 20px;
+            width: calc(100% - 40px);
+            height: 1px;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.1), transparent);
+        }
+        
+        /* Sidebar toggle button */
+        .sidebar-toggle {
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-size: 20px;
+            cursor: pointer;
+            margin-right: 15px;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            left: 15px;
+            z-index: 3;
+        }
+        
+        .sidebar-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Main content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            z-index: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(10, 10, 20, 0.7);
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+        
+        .app-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--secondary);
+            text-align: center;
+            flex-grow: 1;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: absolute;
+            right: 15px;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .user-avatar:hover {
+            transform: scale(1.1);
+            border-color: var(--secondary);
+        }
+        
+        /* Content sections */
+        .content-section {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        /* AI Chat container */
+        .ai-chat-section {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .ai-response-area {
+            flex: 1;
+            background: rgba(15, 15, 25, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .chat-message {
+            max-width: 90%;
+            padding: 12px;
+            border-radius: 12px;
+            animation: fadeIn 0.3s forwards;
+            position: relative;
+            font-size: 14px;
+        }
+        
+        .chat-message p {
+            margin: 0;
+            margin-bottom: 5px;
+        }
+        
+        .user-message {
+            align-self: flex-end;
+            background: rgba(110, 0, 255, 0.3);
+            border-bottom-right-radius: 5px;
+            margin-left: 10%;
+            border: 1px solid rgba(110, 0, 255, 0.5);
+            box-shadow: 0 2px 10px rgba(110, 0, 255, 0.2);
+        }
+        
+        .ai-message {
+            align-self: flex-start;
+            background: rgba(20, 20, 30, 0.7);
+            border-bottom-left-radius: 5px;
+            margin-right: 10%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .ai-message b, .ai-message strong {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+        
+        .ai-message i, .ai-message em {
+            color: var(--accent);
+            font-style: italic;
+        }
+        
+        .ai-message code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 13px;
+        }
+        
+        .ai-message pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border-left: 3px solid var(--primary);
+            margin: 10px 0;
+        }
+        
+        .ai-message pre code {
+            background: transparent;
+            padding: 0;
+            border-radius: 0;
+            white-space: pre-wrap;
+        }
+        
+        .thinking-indicator {
+            color: rgba(255, 255, 255, 0.5);
+            font-style: italic;
+            margin: 10px 0;
+        }
+        
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            opacity: 0;
+            animation: fadeIn 0.3s forwards;
+            animation-delay: 0.5s;
+            align-self: flex-start;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--secondary);
+            border-radius: 50%;
+            margin-right: 5px;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typingAnimation {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+        
+        .input-container {
+            display: flex;
+            align-items: center;
+            background: rgba(15, 15, 25, 0.7);
+            border-radius: 15px;
+            padding: 8px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .input-container textarea {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-size: 14px;
+            padding: 12px 0;
+            resize: none;
+            max-height: 150px;
+            outline: none;
+            min-height: 50px;
+        }
+        
+        .send-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            color: white;
+        }
+        
+        .send-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(110, 0, 255, 0.5);
+        }
+        
+        .send-button:active {
+            transform: scale(0.95);
+        }
+        
+        /* Models section */
+        .models-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+        
+        .model-card {
+            background: rgba(20, 20, 30, 0.7);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .model-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border-color: var(--primary);
+        }
+        
+        .model-card h3 {
+            margin-top: 0;
+            color: var(--secondary);
+            font-size: 16px;
+        }
+        
+        .model-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .model-stat {
+            font-size: 12px;
+        }
+        
+        .model-stat span {
+            display: block;
+            font-weight: bold;
+            color: var(--text);
+        }
+        
+        .model-stat .stat-value {
+            color: var(--primary);
+        }
+        
+        /* API Usage section */
+        .api-usage-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .time-period-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .time-period-btn {
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 5px;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 13px;
+        }
+        
+        .time-period-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .time-period-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .usage-graph {
+            height: 250px;
+            background: rgba(20, 20, 30, 0.7);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+        }
+        
+        .graph-bar {
+            flex: 1;
+            background: var(--primary);
+            border-radius: 5px 5px 0 0;
+            position: relative;
+            transition: height 0.5s ease;
+        }
+        
+        .graph-bar-label {
+            position: absolute;
+            bottom: -22px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 11px;
+            color: var(--text);
+        }
+        
+        .graph-bar-value {
+            position: absolute;
+            top: -22px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 11px;
+            color: var(--text);
+        }
+        
+        .api-key-container {
+            margin-top: 20px;
+            background: rgba(20, 20, 30, 0.7);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .api-key-input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            color: var(--text);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        /* Image Generation Styles */
+        .image-generation-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .image-prompt-container {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .image-prompt-input {
+            flex: 1;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            color: var(--text);
+            font-size: 14px;
+        }
+        
+        .generate-image-btn {
+            padding: 10px 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        
+        .generate-image-btn:hover {
+            background: var(--accent);
+        }
+        
+        .generated-image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+            background: rgba(20, 20, 30, 0.5);
+            border-radius: 10px;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+        
+        .generated-image {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 5px;
+        }
+        
+        /* Memory section */
+        .memory-section textarea {
+            width: 100%;
+            min-height: 200px;
+            background: rgba(15, 15, 25, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 12px;
+            color: var(--text);
+            font-family: monospace;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        
+        .memory-section button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        
+        .memory-section button:hover {
+            background: var(--accent);
+        }
+        
+        /* Status bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 15px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(10, 10, 20, 0.7);
+            backdrop-filter: blur(10px);
+        }
+        
+        .api-status {
+            display: flex;
+            align-items: center;
+        }
+        
+        .status-indicator {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--success);
+            margin-right: 6px;
+            box-shadow: 0 0 8px var(--success);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        /* Floating particles */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        /* Glow effects */
+        .glow {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            filter: blur(30px);
+            opacity: 0.3;
+            z-index: 0;
+        }
+        
+        .glow-1 {
+            background: var(--primary);
+            top: 20%;
+            left: 30%;
+            animation: glowMove 15s infinite alternate;
+        }
+        
+        .glow-2 {
+            background: var(--secondary);
+            bottom: 10%;
+            right: 25%;
+            animation: glowMove 20s infinite alternate-reverse;
+        }
+        
+        @keyframes glowMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(100px, 100px); }
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: var(--dark);
+            border-radius: 10px;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-title {
+            margin-top: 0;
+            color: var(--secondary);
+            font-size: 18px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 15px;
+            gap: 8px;
+        }
+        
+        .modal-button {
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        
+        .modal-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .modal-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+        }
+        
+        /* Donate button */
+        .donate-button {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 10;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            font-size: 14px;
+        }
+        
+        .donate-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .donate-button:active {
+            transform: translateY(0);
+        }
+        
+        /* Donate modal */
+        .donate-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .donate-content {
+            background: var(--dark);
+            border-radius: 10px;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .donate-info {
+            margin: 12px 0;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+        
+        .donate-info h4 {
+            margin-top: 0;
+            color: var(--secondary);
+            font-size: 16px;
+        }
+        
+        .donate-info p {
+            margin: 6px 0;
+            font-size: 14px;
+        }
+        
+        /* Background Remover Styles */
+        .bg-remover-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .upload-area {
+            background: rgba(20, 20, 30, 0.7);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+        
+        .dropzone {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .dropzone:hover {
+            border-color: var(--primary);
+            background: rgba(110, 0, 255, 0.1);
+        }
+        
+        .dropzone p {
+            margin: 8px 0;
+            color: var(--text);
+            opacity: 0.8;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .preview-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+        
+        .preview-box {
+            flex: 1;
+            min-width: 280px;
+            background: rgba(20, 20, 30, 0.7);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .preview-title {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: var(--secondary);
+            text-align: center;
+        }
+        
+        .preview-image {
+            width: 100%;
+            height: auto;
+            border-radius: 6px;
+            display: block;
+            margin: 0 auto;
+            max-height: 300px;
+            object-fit: contain;
+            background: 
+                linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.05) 75%),
+                linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.05) 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        
+        .action-btn {
+            padding: 8px 16px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .primary-btn {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .secondary-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+        }
+        
+        .primary-btn:hover {
+            background: var(--accent);
+        }
+        
+        .secondary-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid var(--primary);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            color: var(--error);
+            text-align: center;
+            margin: 10px 0;
+            font-size: 14px;
+            display: none;
+        }
+        
+        /* Translation specific styles */
+        .translation-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            margin: 0 auto;
+            background-color: var(--container-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .translation-composer {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+            gap: 20px;
+        }
+
+        .translation-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .translation-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .translation-field label {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--primary);
+        }
+
+        .translation-field textarea,
+        .translation-field select {
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--input-bg);
+            color: var(--text);
+            font-size: 15px;
+        }
+
+        .translation-field textarea {
+            min-height: 150px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        .translation-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .translation-result {
+            margin-top: 20px;
+            padding: 25px;
+            background-color: var(--translation-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            white-space: pre-wrap;
+            flex: 1;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+
+        .translation-typing-indicator {
+            display: none;
+            padding: 15px;
+            background-color: var(--container-bg);
+            border-radius: 12px;
+            margin: 10px 0;
+            text-align: center;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .translation-typing-dots {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-top: 8px;
+        }
+
+        .translation-typing-dot {
+            width: 10px;
+            height: 10px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+
+        .action-button {
+            padding: 12px 24px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-button:hover {
+            background-color: var(--secondary);
+            transform: translateY(-1px);
+        }
+
+        .action-button:active {
+            transform: translateY(0);
+        }
+
+        .action-button.secondary {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text);
+        }
+
+        .action-button.secondary:hover {
+            background-color: var(--input-bg);
+        }
+
+        .language-selectors {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .language-selector {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                height: 100%;
+            }
+            
+            .models-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .preview-area {
+                flex-direction: column;
+            }
+            
+            .preview-box {
+                min-width: 100%;
+            }
+            
+            .header {
+                padding: 12px 15px;
+            }
+            
+            .app-title {
+                font-size: 16px;
+            }
+            
+            .user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+            
+            .content-section {
+                padding: 15px;
+            }
+
+            .language-selectors {
+                flex-direction: column;
+            }
+
+            .language-selector {
+                min-width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .action-btn {
+                width: 100%;
+            }
+
+            .translation-actions {
+                flex-direction: column;
+            }
+
+            .action-button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Animated background elements -->
+        <div class="bg-element bg-1"></div>
+        <div class="bg-element bg-2"></div>
+        
+        <!-- Sidebar toggle button -->
+        <button id="sidebar-toggle" class="sidebar-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <!-- Sidebar navigation -->
+        <div class="sidebar">
+            <a href="#" class="nav-item active" data-section="ai-chat">
+                <i class="fas fa-robot"></i>
+                <span>AI Nexus</span>
+            </a>
+            <a href="#" class="nav-item" data-section="code-generator">
+                <i class="fas fa-code"></i>
+                <span>Code Generator</span>
+            </a>
+            <a href="#" class="nav-item" data-section="translation">
+                <i class="fas fa-language"></i>
+                <span>Translation</span>
+            </a>
+            <a href="#" class="nav-item" data-section="image-generation">
+                <i class="fas fa-image"></i>
+                <span>Image Generation</span>
+            </a>
+            <a href="#" class="nav-item" data-section="bg-remover">
+                <i class="fas fa-cut"></i>
+                <span>Background Remover</span>
+            </a>
+            <a href="#" class="nav-item" data-section="api-usage">
+                <i class="fas fa-chart-line"></i>
+                <span>API Usage</span>
+            </a>
+            <a href="#" class="nav-item" data-section="models">
+                <i class="fas fa-brain"></i>
+                <span>Models</span>
+            </a>
+            <a href="#" class="nav-item" data-section="settings">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+            <a href="#" class="nav-item" data-section="memory">
+                <i class="fas fa-memory"></i>
+                <span>Memory</span>
+            </a>
+        </div>
+        
+        <!-- Main content area -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="app-title">Nexus AI</div>
+                <div class="user-menu">
+                    <button id="signin-btn" class="modal-button modal-primary">Sign In</button>
+                    <div class="user-avatar" id="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- AI Chat section -->
+            <div class="content-section active" id="ai-chat">
+                <div class="ai-chat-section">
+                    <!-- Glow effects -->
+                    <div class="glow glow-1"></div>
+                    <div class="glow glow-2"></div>
+                    
+                    <!-- AI response area -->
+                    <div class="ai-response-area" id="chat-messages">
+                        <div class="chat-message ai-message">
+                            <h3 style="color: var(--secondary); margin-bottom: 15px;">Nexus AI Activated</h3>
+                            <p>Welcome to the legendary AI interface. I'm connected to the Groq API and ready to assist you with ultra-fast responses.</p>
+                            <p>This interface features:</p>
+                            <ul>
+                                <li>Real-time streaming responses</li>
+                                <li>Advanced natural language understanding</li>
+                                <li>Customizable dark UI with animations</li>
+                                <li>Integrated API connectivity</li>
+                                <li>Responsive design for all devices</li>
+                            </ul>
+                            <p>How can I assist you today?</p>
+                        </div>
+                    </div>
+                    
+                    <!-- User input area -->
+                    <div class="input-container">
+                        <textarea id="user-input" placeholder="Ask the AI anything..."></textarea>
+                        <button class="send-button" id="send-button">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Code Generator section -->
+            <div class="content-section" id="code-generator">
+                <h2>Code Generator</h2>
+                <div class="ai-chat-section">
+                    <!-- AI response area -->
+                    <div class="ai-response-area" id="code-messages">
+                        <div class="chat-message ai-message">
+                            <h3 style="color: var(--secondary); margin-bottom: 15px;">Code Generator</h3>
+                            <p>Describe the code you want to generate and I'll create it for you using the latest AI models.</p>
+                            <p>Examples:</p>
+                            <ul>
+                                <li>"Create a Python function to calculate factorial"</li>
+                                <li>"Show me a React component for a login form"</li>
+                                <li>"Generate SQL query to find duplicate records"</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- User input area -->
+                    <div class="input-container">
+                        <textarea id="code-input" placeholder="Describe the code you want to generate..."></textarea>
+                        <button class="send-button" id="code-send-button">
+                            <i class="fas fa-code"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Translation section -->
+            <div class="content-section" id="translation">
+                <h2>Professional Translation</h2>
+                <div class="translation-container">
+                    <div class="translation-composer">
+                        <form class="translation-form" id="translation-form">
+                            <div class="language-selectors">
+                                <div class="translation-field language-selector">
+                                    <label for="source-language">Source Language:</label>
+                                    <select id="source-language">
+                                        <option value="auto">Auto-detect</option>
+                                        <option value="en">English</option>
+                                        <option value="es">Spanish</option>
+                                        <option value="fr">French</option>
+                                        <option value="de">German</option>
+                                        <option value="it">Italian</option>
+                                        <option value="pt">Portuguese</option>
+                                        <option value="ru">Russian</option>
+                                        <option value="zh">Chinese</option>
+                                        <option value="ja">Japanese</option>
+                                        <option value="ar">Arabic</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="translation-field language-selector">
+                                    <label for="target-language">Target Language:</label>
+                                    <select id="target-language">
+                                        <option value="en">English</option>
+                                        <option value="es">Spanish</option>
+                                        <option value="fr">French</option>
+                                        <option value="de">German</option>
+                                        <option value="it">Italian</option>
+                                        <option value="pt">Portuguese</option>
+                                        <option value="ru">Russian</option>
+                                        <option value="zh">Chinese</option>
+                                        <option value="ja">Japanese</option>
+                                        <option value="ar">Arabic</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="translation-field">
+                                <label for="source-text">Text to Translate:</label>
+                                <textarea id="source-text" placeholder="Enter the text you want to translate..."></textarea>
+                            </div>
+                            
+                            <div class="translation-actions">
+                                <button type="button" class="action-button" id="translate-button">
+                                    <i class="fas fa-exchange-alt"></i>
+                                    Translate
+                                </button>
+                                <button type="button" class="action-button secondary" id="clear-button">
+                                    <i class="fas fa-trash"></i>
+                                    Clear
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <div class="translation-typing-indicator" id="typing-indicator">
+                            Translating your text...
+                            <div class="translation-typing-dots">
+                                <div class="translation-typing-dot"></div>
+                                <div class="translation-typing-dot"></div>
+                                <div class="translation-typing-dot"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="translation-result" id="translation-result">
+                            Your translation will appear here. Enter text and click "Translate".
+                        </div>
+                        
+                        <div class="translation-actions">
+                            <button type="button" class="action-button" id="copy-button">
+                                <i class="fas fa-copy"></i>
+                                Copy Translation
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Image Generation section -->
+            <div class="content-section" id="image-generation">
+                <h2>AI Image Generation</h2>
+                <div class="image-generation-container">
+                    <div class="image-prompt-container">
+                        <input type="text" id="image-prompt" class="image-prompt-input" placeholder="Describe the image you want to generate...">
+                        <button class="generate-image-btn" id="generate-image-btn">Generate</button>
+                        <button class="generate-image-btn" id="test-image-btn" style="background: var(--accent);">Test Image</button>
+                    </div>
+                    <div class="generated-image-container" id="generated-image-container">
+                        <p>Your generated image will appear here</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Background Remover section -->
+            <div class="content-section" id="bg-remover">
+                <h2>Background Remover</h2>
+                <div class="bg-remover-container">
+                    <div class="upload-area">
+                        <div id="dropzone" class="dropzone">
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--primary); margin-bottom: 10px;"></i>
+                            <p>Drag & drop your image here</p>
+                            <p>or</p>
+                            <input type="file" id="fileInput" class="file-input" accept="image/*">
+                            <button class="action-btn primary-btn" id="select-file-btn">Select Image</button>
+                        </div>
+                        
+                        <div class="error-message" id="bg-error-message"></div>
+                        
+                        <div class="action-buttons">
+                            <button id="remove-bg-btn" class="action-btn primary-btn" disabled>Remove Background</button>
+                            <button id="reset-bg-btn" class="action-btn secondary-btn" disabled>Reset</button>
+                        </div>
+                    </div>
+                    
+                    <div id="bg-loading" class="loading">
+                        <div class="spinner"></div>
+                        <p>Processing your image...</p>
+                    </div>
+                    
+                    <div class="preview-area" id="bg-preview-area" style="display: none;">
+                        <div class="preview-box">
+                            <h3 class="preview-title">Original Image</h3>
+                            <img id="original-preview" class="preview-image" src="" alt="Original Image">
+                        </div>
+                        
+                        <div class="preview-box">
+                            <h3 class="preview-title">Background Removed</h3>
+                            <img id="processed-preview" class="preview-image" src="" alt="Processed Image">
+                            <button id="download-bg-btn" class="action-btn primary-btn" style="margin-top: 10px; width: 100%;">
+                                <i class="fas fa-download"></i> Download Result
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- API Usage section -->
+            <div class="content-section" id="api-usage">
+                <h2>API Usage Statistics</h2>
+                <div class="api-usage-container">
+                    <div class="time-period-selector">
+                        <button class="time-period-btn active" data-period="24h">24 Hours</button>
+                        <button class="time-period-btn" data-period="7d">7 Days</button>
+                        <button class="time-period-btn" data-period="30d">30 Days</button>
+                    </div>
+                    
+                    <div class="usage-graph" id="usage-graph">
+                        <!-- Graph will be generated here -->
+                    </div>
+                    
+                    <div class="api-key-container">
+                        <h3>API Key Configuration</h3>
+                        <div class="api-key-group">
+                            <h4>Groq API Key</h4>
+                            <input type="password" id="groq-api-key" class="api-key-input" placeholder="Enter your Groq API key">
+                        </div>
+                        <div class="api-key-group" style="margin-top: 15px;">
+                            <h4>Hugging Face API Key</h4>
+                            <input type="password" id="hf-api-key" class="api-key-input" placeholder="Enter your Hugging Face API key">
+                        </div>
+                        <button id="save-api-key" class="modal-button modal-primary" style="margin-top: 15px;">Save API Keys</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Models section -->
+            <div class="content-section" id="models">
+                <h2>Available Models</h2>
+                <div class="models-section" id="models-container">
+                    <!-- Models will be loaded here -->
+                </div>
+            </div>
+            
+            <!-- Settings section -->
+            <div class="content-section" id="settings">
+                <h2>Settings</h2>
+                <div class="settings-content">
+                    <div class="setting-item">
+                        <h3>Appearance</h3>
+                        <div class="setting-control">
+                            <label for="theme-select">Theme:</label>
+                            <select id="theme-select">
+                                <option value="dark">Dark</option>
+                                <option value="light">Light</option>
+                                <option value="system">System</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Memory section -->
+            <div class="content-section" id="memory">
+                <h2>AI Memory & Prompt Injection</h2>
+                <p>Configure the AI's system memory and behavior rules. These will be injected into every prompt.</p>
+                <textarea id="memory-text" placeholder="Enter memory instructions here..."></textarea>
+                <button id="save-memory">Save Memory</button>
+                <div class="memory-examples">
+                    <h3>Examples:</h3>
+                    <ul>
+                        <li>Always respond in a formal tone</li>
+                        <li>When user says **important**, make it bold</li>
+                        <li>Keep responses under 200 words</li>
+                        <li>Use &lt;think&gt; tags for internal reasoning</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Status bar -->
+            <div class="status-bar">
+                <div class="api-status">
+                    <div class="status-indicator"></div>
+                    <span id="api-status-text">GROQ API: Not Connected</span>
+                </div>
+                <div class="system-info">
+                    <span id="model-info">Model: Not Selected | v2.4.1</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Floating particles -->
+        <div class="particles" id="particles"></div>
+        
+        <!-- Donate button -->
+        <button class="donate-button" id="donate-button">
+            <i class="fas fa-heart"></i> Donate
+        </button>
+        
+        <!-- Donate modal -->
+        <div class="donate-modal" id="donate-modal">
+            <div class="donate-content">
+                <h2 class="modal-title">Support This Project</h2>
+                <p>If you find this tool helpful, consider supporting the developer with a donation.</p>
+                
+                <div class="donate-info">
+                    <h4>JazzCash</h4>
+                    <p><strong>Number:</strong> 03001234567</p>
+                    <p><strong>Name:</strong> Developer Name</p>
+                </div>
+                
+                <div class="donate-info">
+                    <h4>EasyPaisa</h4>
+                    <p><strong>Number:</strong> 03001234567</p>
+                    <p><strong>Name:</strong> Developer Name</p>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="modal-button modal-primary" id="close-donate">Close</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Google Sign In Modal -->
+        <div class="modal" id="signin-modal">
+            <div class="modal-content">
+                <h2 class="modal-title">Sign In</h2>
+                <p>Sign in with Google to access all features and sync your data across devices.</p>
+                <div id="google-signin-btn" class="modal-button modal-primary">
+                    <i class="fab fa-google"></i> Sign in with Google
+                </div>
+                <div class="modal-actions">
+                    <button class="modal-button modal-secondary" id="close-signin">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDMecHBW8lBkeUoeWmGxwqghh5_3pvg5fc",
+            authDomain: "aicutomerrrrrrrrrr.firebaseapp.com",
+            projectId: "aicutomerrrrrrrrrr",
+            storageBucket: "aicutomerrrrrrrrrr.appspot.com",
+            messagingSenderId: "210634125174",
+            appId: "1:210634125174:web:0d32846c144d93b6dad457",
+            measurementId: "G-2FP7854XPY"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        // Make auth available globally
+        window.auth = auth;
+        window.signInWithPopup = signInWithPopup;
+        window.signOut = signOut;
+        
+        // Handle auth state changes
+        onAuthStateChanged(auth, async (user) => {
+            const userAvatar = document.getElementById('user-avatar');
+            const signinBtn = document.getElementById('signin-btn');
+            
+            if (user) {
+                // User is signed in
+                userAvatar.innerHTML = '';
+                userAvatar.style.backgroundImage = `url(${user.photoURL})`;
+                userAvatar.style.backgroundSize = 'cover';
+                signinBtn.textContent = 'Sign Out';
+                signinBtn.onclick = () => signOut(auth);
+                
+                // Load user data
+                await loadUserData(user.uid);
+                
+                // Show welcome message
+                addMessageToChat('system', `Welcome back, ${user.displayName}! Your session has been restored.`);
+            } else {
+                // User is signed out
+                userAvatar.innerHTML = '<i class="fas fa-user"></i>';
+                userAvatar.style.backgroundImage = '';
+                signinBtn.textContent = 'Sign In';
+                signinBtn.onclick = showSignInModal;
+            }
+        });
+
+        // Load user data from Firestore
+        async function loadUserData(userId) {
+            const userRef = doc(db, "users", userId);
+            const userSnap = await getDoc(userRef);
+            
+            if (userSnap.exists()) {
+                const userData = userSnap.data();
+                if (userData.groqApiKey) {
+                    document.getElementById('groq-api-key').value = userData.groqApiKey;
+                    window.apiKey = userData.groqApiKey;
+                    updateApiStatus();
+                }
+                if (userData.hfApiKey) {
+                    document.getElementById('hf-api-key').value = userData.hfApiKey;
+                    window.hfApiKey = userData.hfApiKey;
+                }
+                if (userData.memoryInstructions) {
+                    document.getElementById('memory-text').value = userData.memoryInstructions;
+                    window.memoryInstructions = userData.memoryInstructions;
+                }
+                if (userData.chatHistory) {
+                    window.chatHistory = userData.chatHistory;
+                }
+            } else {
+                // Create new user document
+                await setDoc(userRef, {
+                    createdAt: new Date(),
+                    chatHistory: [],
+                    messageCount: 0
+                });
+            }
+        }
+
+        // Save user data to Firestore
+        async function saveUserData(userId, data) {
+            const userRef = doc(db, "users", userId);
+            await updateDoc(userRef, data);
+        }
+
+        // Handle Google sign-in button
+        document.getElementById('google-signin-btn').addEventListener('click', () => {
+            signInWithPopup(auth, provider)
+                .then((result) => {
+                    // Hide modal on successful sign-in
+                    hideSignInModal();
+                })
+                .catch((error) => {
+                    console.error('Sign-in error:', error);
+                    addMessageToChat('system', `Sign-in error: ${error.message}`);
+                });
+        });
+    </script>
+
+    <script>
+        // Current state
+        let currentModel = null;
+        let memoryInstructions = "";
+        let apiKey = localStorage.getItem('groqApiKey') || "";
+        let hfApiKey = localStorage.getItem('hfApiKey') || "";
+        let chatHistory = [];
+        let messageCount = 0;
+        
+        // Available models with their details
+        const models = {
+            'meta-llama/llama-4-maverick-17b-128e-instruct': {
+                displayName: 'Llama 4 Maverick 17B',
+                description: '17B parameter instruction-tuned model with 128k context',
+                rpm: 30,
+                rpd: '1K',
+                tpm: '6K',
+                tpd: '500K',
+                supportsImages: false
+            },
+            'meta-llama/llama-4-scout-17b-16e-instruct': {
+                displayName: 'Llama 4 Scout 17B',
+                description: '17B parameter scouting model with 16k context',
+                rpm: 30,
+                rpd: '1K',
+                tpm: '30K',
+                tpd: '500K',
+                supportsImages: false
+            },
+            'stabilityai/stable-diffusion-xl-base-1.0': {
+                displayName: 'Stable Diffusion XL',
+                description: 'High-quality image generation model',
+                rpm: 10,
+                rpd: '100',
+                tpm: '1.2K',
+                tpd: '3.6K',
+                supportsImages: true,
+                isImageModel: true
+            },
+            'meta-llama/llama-guard-4-12b': {
+                displayName: 'Llama Guard 4 12B',
+                description: '12B parameter safety model for content moderation',
+                rpm: 30,
+                rpd: '14.4K',
+                tpm: '15K',
+                tpd: '500K',
+                supportsImages: false
+            },
+            'meta-llama/llama-prompt-guard-2-22m': {
+                displayName: 'Prompt Guard 2 22M',
+                description: 'Lightweight prompt safety model (22M parameters)',
+                rpm: 30,
+                rpd: '14.4K',
+                tpm: '15K',
+                tpd: '500K',
+                supportsImages: false
+            },
+            'meta-llama/llama-prompt-guard-2-86m': {
+                displayName: 'Prompt Guard 2 86M',
+                description: 'Mid-size prompt safety model (86M parameters)',
+                rpm: 30,
+                rpd: '14.4K',
+                tpm: '15K',
+                tpd: '500K',
+                supportsImages: false
+            },
+            'moonshotai/kimi-k2-instruct': {
+                displayName: 'Kimi K2 Instruct',
+                description: 'High-performance instruction model from Moonshot AI',
+                rpm: 60,
+                rpd: '1K',
+                tpm: '10K',
+                tpd: '300K',
+                supportsImages: false
+            },
+            'openai/gpt-oss-120b': {
+                displayName: 'GPT OSS 120B',
+                description: 'Large 120B parameter model from OpenAI',
+                rpm: 30,
+                rpd: '1K',
+                tpm: '8K',
+                tpd: '200K',
+                supportsImages: false
+            },
+            'openai/gpt-oss-20b': {
+                displayName: 'GPT OSS 20B',
+                description: '20B parameter model from OpenAI',
+                rpm: 30,
+                rpd: '1K',
+                tpm: '8K',
+                tpd: '200K',
+                supportsImages: false
+            },
+            'playai-tts': {
+                displayName: 'PlayAI TTS',
+                description: 'General purpose text-to-speech model',
+                rpm: 10,
+                rpd: '100',
+                tpm: '1.2K',
+                tpd: '3.6K',
+                supportsImages: false
+            },
+            'playai-tts-arabic': {
+                displayName: 'PlayAI TTS Arabic',
+                description: 'Arabic text-to-speech model',
+                rpm: 10,
+                rpd: '100',
+                tpm: '1.2K',
+                tpd: '3.6K',
+                supportsImages: false
+            },
+            'qwen/qwen3-32b': {
+                displayName: 'Qwen3 32B',
+                description: '32B parameter model from Qwen',
+                rpm: 30,
+                rpd: '14.4K',
+                tpm: '15K',
+                tpd: '500K',
+                supportsImages: false
+            },
+            'gemma2-9b-it': {
+                displayName: 'Gemma2 9B IT',
+                description: '9B parameter instruction-tuned model',
+                rpm: 30,
+                rpd: '14.4K',
+                tpm: '15K',
+                tpd: '500K',
+                supportsImages: false
+            },
+            'llama-3.1-8b-instant': {
+                displayName: 'Llama 3.1 8B Instant',
+                description: 'Fast 8B parameter model with instant responses',
+                rpm: 30,
+                rpd: '14.4K',
+                tpm: '6K',
+                tpd: '500K',
+                supportsImages: false
+            },
+            'llama-3.3-70b-versatile': {
+                displayName: 'Llama 3.3 70B Versatile',
+                description: 'Versatile 70B parameter model for complex tasks',
+                rpm: 30,
+                rpd: '1K',
+                tpm: '12K',
+                tpd: '100K',
+                supportsImages: false
+            },
+            'llama3-70b-8192': {
+                displayName: 'Llama3 70B 8192',
+                description: '70B parameter model with 8K context window',
+                rpm: 30,
+                rpd: '14.4K',
+                tpm: '6K',
+                tpd: '500K',
+                supportsImages: false
+            },
+            'llama3-8b-8192': {
+                displayName: 'Llama3 8B 8192',
+                description: '8B parameter model with 8K context window',
+                rpm: 30,
+                rpd: '14.4K',
+                tpm: '6K',
+                tpd: '500K',
+                supportsImages: false
+            }
+        };
+
+        // Initialize the application
+        function init() {
+            // Create floating particles
+            createParticles();
+            
+            // Load UI components
+            loadModels();
+            setupNavigation();
+            setupChat();
+            setupCodeGenerator();
+            setupTranslation();
+            setupImageGeneration();
+            setupBgRemover();
+            setupMemory();
+            setupApiKey();
+            setupApiUsage();
+            
+            // Update API status
+            updateApiStatus();
+            
+            // Setup sidebar toggle
+            document.getElementById('sidebar-toggle').addEventListener('click', toggleSidebar);
+            
+            // Setup donate button
+            document.getElementById('donate-button').addEventListener('click', showDonateModal);
+            document.getElementById('close-donate').addEventListener('click', hideDonateModal);
+        }
+        
+        // Setup translation functionality
+        function setupTranslation() {
+            const translateButton = document.getElementById('translate-button');
+            const clearButton = document.getElementById('clear-button');
+            const copyButton = document.getElementById('copy-button');
+            const sourceText = document.getElementById('source-text');
+            const translationResult = document.getElementById('translation-result');
+            const typingIndicator = document.getElementById('typing-indicator');
+            
+            // System prompt for translation with clear instructions
+            const translationSystemPrompt = `You are a professional translation assistant powered by shadow/nexus Llama 3 8B model. 
+            Your task is to provide accurate, natural-sounding translations between languages.
+            
+            GUIDELINES:
+            1. Always maintain the original meaning while making the translation sound natural in the target language
+            2. Preserve technical terms, names, and proper nouns unless there's a known translation
+            3. Adapt cultural references appropriately when needed
+            4. Maintain the same tone (formal, informal) as the source text
+            5. For ambiguous terms, choose the most likely meaning based on context
+            6. Format the response as: "Translation: [your translation here]"
+            
+            IMPORTANT: If the source language is set to "auto", first identify the language before translating.
+            Only respond with the translation, no additional commentary unless there's a critical ambiguity.`;
+            
+            // Translate button click handler
+            translateButton.addEventListener('click', async () => {
+                const sourceLanguage = document.getElementById('source-language').value;
+                const targetLanguage = document.getElementById('target-language').value;
+                const text = sourceText.value.trim();
+                
+                if (!text) {
+                    translationResult.textContent = "Please enter text to translate";
+                    return;
+                }
+                
+                typingIndicator.style.display = 'block';
+                translationResult.textContent = "Translating your text...";
+                
+                try {
+                    if (!currentModel) {
+                        currentModel = 'llama3-8b-8192'; // Default to 8B model for translation
+                    }
+                    
+                    if (!apiKey) {
+                        throw new Error('API key not configured. Please enter your Groq API key in Settings.');
+                    }
+                    
+                    const prompt = [
+                        {
+                            role: "system",
+                            content: translationSystemPrompt
+                        },
+                        {
+                            role: "user",
+                            content: `Translate this text from ${sourceLanguage === 'auto' ? 'auto-detected language' : sourceLanguage} to ${targetLanguage}:\n\n${text}`
+                        }
+                    ];
+                    
+                    const response = await callGroqAPI(prompt);
+                    
+                    // Clean up the response
+                    let cleanTranslation = response.replace(/^Translation: /i, '').trim();
+                    translationResult.textContent = cleanTranslation;
+                    
+                    // Increment message count and update graph
+                    messageCount++;
+                    updateUsageGraph(document.querySelector('.time-period-btn.active').dataset.period);
+                    
+                    // Save to Firestore if signed in
+                    if (auth.currentUser) {
+                        await saveUserData(auth.currentUser.uid, {
+                            messageCount: messageCount,
+                            chatHistory: arrayUnion({
+                                user: `Translate from ${sourceLanguage} to ${targetLanguage}: ${text}`,
+                                ai: cleanTranslation,
+                                timestamp: new Date().toISOString(),
+                                model: currentModel
+                            })
+                        });
+                    }
+                } catch (error) {
+                    translationResult.textContent = `Error: ${error.message}`;
+                } finally {
+                    typingIndicator.style.display = 'none';
+                }
+            });
+            
+            // Clear button click handler
+            clearButton.addEventListener('click', () => {
+                sourceText.value = '';
+                translationResult.textContent = "Your translation will appear here. Enter text and click \"Translate\".";
+            });
+            
+            // Copy button click handler
+            copyButton.addEventListener('click', () => {
+                const translationText = translationResult.textContent;
+                if (translationText && !translationText.includes("Your translation will appear here")) {
+                    navigator.clipboard.writeText(translationText)
+                        .then(() => {
+                            // Show temporary success message
+                            const originalText = translationResult.textContent;
+                            translationResult.textContent = "Translation copied to clipboard!";
+                            setTimeout(() => {
+                                translationResult.textContent = originalText;
+                            }, 2000);
+                        })
+                        .catch(err => {
+                            translationResult.textContent = `Failed to copy translation: ${err.message}`;
+                        });
+                }
+            });
+        }
+        
+        // Toggle sidebar
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('collapsed');
+        }
+        
+        // Show donate modal
+        function showDonateModal() {
+            document.getElementById('donate-modal').style.display = 'flex';
+        }
+        
+        // Hide donate modal
+        function hideDonateModal() {
+            document.getElementById('donate-modal').style.display = 'none';
+        }
+        
+        // Setup code generator
+        function setupCodeGenerator() {
+            const sendButton = document.getElementById('code-send-button');
+            const codeInput = document.getElementById('code-input');
+            
+            sendButton.addEventListener('click', sendCodeRequest);
+            
+            codeInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendCodeRequest();
+                }
+            });
+        }
+        
+        // Send code generation request
+        async function sendCodeRequest() {
+            const codeInput = document.getElementById('code-input');
+            const message = codeInput.value.trim();
+            
+            if (!message) return;
+            
+            // Clear input
+            codeInput.value = '';
+            
+            // Add user message to chat
+            addMessageToCodeChat('user', message);
+            
+            // Show typing indicator
+            showCodeTypingIndicator();
+            
+            // Call the actual Groq API
+            try {
+                if (!currentModel) {
+                    currentModel = 'llama3-70b-8192'; // Default to 70B model for code generation
+                }
+                
+                if (!apiKey) {
+                    throw new Error('API key not configured. Please enter your Groq API key in Settings.');
+                }
+                
+                // Add specific instructions for code generation
+                const prompt = `Generate code based on the following description. 
+                - Format the response with proper code blocks and syntax highlighting.
+                - Include clear explanations if needed.
+                - Make sure the code is complete and functional.
+                - If the request is unclear, ask for clarification.
+                
+                Request: ${message}`;
+                
+                const response = await callGroqAPI(prompt);
+                
+                // Hide typing indicator
+                hideCodeTypingIndicator();
+                
+                // Add AI response to chat
+                addMessageToCodeChat('ai', response);
+                
+                // Save to chat history
+                saveToHistory(message, response);
+                
+                // Increment message count and update graph
+                messageCount++;
+                updateUsageGraph(document.querySelector('.time-period-btn.active').dataset.period);
+                
+                // Save to Firestore if signed in
+                if (auth.currentUser) {
+                    await saveUserData(auth.currentUser.uid, {
+                        messageCount: messageCount,
+                        chatHistory: arrayUnion({
+                            user: message,
+                            ai: response,
+                            timestamp: new Date().toISOString(),
+                            model: currentModel
+                        })
+                    });
+                }
+                
+            } catch (error) {
+                // Hide typing indicator
+                hideCodeTypingIndicator();
+                
+                // Show error message
+                addMessageToCodeChat('system', `Error: ${error.message}`);
+            }
+        }
+        
+        // Add message to code chat
+        function addMessageToCodeChat(sender, message) {
+            const codeMessages = document.getElementById('code-messages');
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${sender}-message`;
+            
+            if (sender === 'user') {
+                messageDiv.innerHTML = `
+                    <div class="user-message">${message}</div>
+                `;
+            } else if (sender === 'ai') {
+                // Process AI message formatting with special handling for code
+                const processedMessage = formatCodeMessage(message);
+                messageDiv.innerHTML = `
+                    <div class="ai-message">${processedMessage}</div>
+                `;
+            } else if (sender === 'system') {
+                messageDiv.innerHTML = `
+                    <div class="ai-message" style="color: var(--accent);">${message}</div>
+                `;
+            }
+            
+            codeMessages.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            codeMessages.scrollTop = codeMessages.scrollHeight;
+        }
+        
+        // Format code message with special handling for code blocks
+        function formatCodeMessage(message) {
+            // Replace triple backticks with code blocks
+            message = message.replace(/```([a-z]*)\n([\s\S]*?)\n```/g, function(match, lang, code) {
+                return `<pre><code class="language-${lang}">${code}</code></pre>`;
+            });
+            
+            // Replace single backticks with inline code
+            message = message.replace(/`([^`]+)`/g, '<code>$1</code>');
+            
+            // Replace ** with bold
+            message = message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+            // Replace * with italics
+            message = message.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            
+            // Replace - at start of line with bullet points
+            message = message.replace(/^- (.*$)/gm, '<li>$1</li>');
+            
+            // Replace numbered lists
+            message = message.replace(/^(\d+)\. (.*$)/gm, '<li>$2</li>');
+            
+            // Wrap lines starting with li in ul tags
+            message = message.replace(/(<li>.*<\/li>)+/g, function(match) {
+                return `<ul>${match}</ul>`;
+            });
+            
+            return message;
+        }
+        
+        // Show typing indicator for code generator
+        function showCodeTypingIndicator() {
+            const codeMessages = document.getElementById('code-messages');
+            
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.id = 'current-code-typing-indicator';
+            typingDiv.innerHTML = `
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            `;
+            
+            codeMessages.appendChild(typingDiv);
+            codeMessages.scrollTop = codeMessages.scrollHeight;
+        }
+        
+        // Hide typing indicator for code generator
+        function hideCodeTypingIndicator() {
+            const typingIndicator = document.getElementById('current-code-typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+        
+        // Setup image generation
+        function setupImageGeneration() {
+            const generateBtn = document.getElementById('generate-image-btn');
+            const testBtn = document.getElementById('test-image-btn');
+            
+            generateBtn.addEventListener('click', generateImage);
+            testBtn.addEventListener('click', testImageGeneration);
+        }
+        
+        // Test image generation with fallback API keys
+        async function testImageGeneration() {
+            const prompt = document.getElementById('image-prompt').value;
+            const container = document.getElementById('generated-image-container');
+            
+            if (!prompt) {
+                container.innerHTML = '<p style="color: var(--error)">Please enter a prompt</p>';
+                return;
+            }
+            
+            container.innerHTML = '<p>Generating test image... <i class="fas fa-spinner fa-spin"></i></p>';
+            
+            // List of test API keys to try
+            const testApiKeys = [
+                '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',
+                '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',
+                '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',
+                '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'
+            ];
+            
+            let lastError = null;
+            
+            // Try each API key until one works
+            for (const apiKey of testApiKeys) {
+                try {
+                    const response = await fetch(`https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0`, {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${apiKey}`,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            inputs: prompt,
+                            options: { wait_for_model: true }
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        lastError = `API error: ${errorText}`;
+                        continue; // Try next API key
+                    }
+
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    container.innerHTML = `<img src="${url}" class="generated-image">`;
+                    
+                    // Increment message count and update graph
+                    messageCount++;
+                    updateUsageGraph(document.querySelector('.time-period-btn.active').dataset.period);
+                    
+                    // Save to Firestore if signed in
+                    if (auth.currentUser) {
+                        await saveUserData(auth.currentUser.uid, {
+                            messageCount: messageCount
+                        });
+                    }
+                    
+                    return; // Success, exit the function
+                } catch (err) {
+                    lastError = err.message;
+                    continue; // Try next API key
+                }
+            }
+            
+            // If we get here, all API keys failed
+            container.innerHTML = `<p style="color: var(--error)">All test API keys failed. Last error: ${lastError}</p>`;
+        }
+        
+        // Generate image using Hugging Face API
+        async function generateImage() {
+            const prompt = document.getElementById('image-prompt').value;
+            const container = document.getElementById('generated-image-container');
+            
+            if (!prompt) {
+                container.innerHTML = '<p style="color: var(--error)">Please enter a prompt</p>';
+                return;
+            }
+            
+            if (!hfApiKey) {
+                container.innerHTML = '<p style="color: var(--error)">Please enter your Hugging Face API key in the API Usage section</p>';
+                return;
+            }
+            
+            container.innerHTML = '<p>Generating image... <i class="fas fa-spinner fa-spin"></i></p>';
+            
+            try {
+                const response = await fetch(`https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${hfApiKey}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        inputs: prompt,
+                        options: { wait_for_model: true }
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    container.innerHTML = `<p style="color: var(--error)">Error: ${errorText}</p>`;
+                    return;
+                }
+
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                container.innerHTML = `<img src="${url}" class="generated-image">`;
+                
+                // Increment message count and update graph
+                messageCount++;
+                updateUsageGraph(document.querySelector('.time-period-btn.active').dataset.period);
+                
+                // Save to Firestore if signed in
+                if (auth.currentUser) {
+                    await saveUserData(auth.currentUser.uid, {
+                        messageCount: messageCount
+                    });
+                }
+                
+            } catch (err) {
+                container.innerHTML = `<p style="color: var(--error)">Error: ${err.message}</p>`;
+            }
+        }
+        
+        // Setup background remover
+        function setupBgRemover() {
+            const dropzone = document.getElementById('dropzone');
+            const fileInput = document.getElementById('fileInput');
+            const selectFileBtn = document.getElementById('select-file-btn');
+            const removeBgBtn = document.getElementById('remove-bg-btn');
+            const resetBgBtn = document.getElementById('reset-bg-btn');
+            const downloadBgBtn = document.getElementById('download-bg-btn');
+            const bgLoading = document.getElementById('bg-loading');
+            const bgPreviewArea = document.getElementById('bg-preview-area');
+            const originalPreview = document.getElementById('original-preview');
+            const processedPreview = document.getElementById('processed-preview');
+            const bgErrorMessage = document.getElementById('bg-error-message');
+            
+            let selectedFile = null;
+            let processedImageUrl = null;
+            
+            // Background remover API keys
+            const bgApiKeys = [
+                'cjpRPDQvcHWcQaNke6rUUqaB',
+                't8KZHpDCRLhpgjowDQmmyeX5',
+                'C3HPyzau6sXwcjLDxErU6jFs'
+            ];
+            
+            // Event listeners
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzone.style.borderColor = 'var(--primary)';
+                dropzone.style.background = 'rgba(110, 0, 255, 0.1)';
+            });
+            
+            dropzone.addEventListener('dragleave', () => {
+                dropzone.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                dropzone.style.background = 'transparent';
+            });
+            
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                dropzone.style.background = 'transparent';
+                
+                if (e.dataTransfer.files.length) {
+                    handleFile(e.dataTransfer.files[0]);
+                }
+            });
+            
+            selectFileBtn.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length) {
+                    handleFile(fileInput.files[0]);
+                }
+            });
+            
+            removeBgBtn.addEventListener('click', removeBackground);
+            resetBgBtn.addEventListener('click', resetBgRemover);
+            downloadBgBtn.addEventListener('click', downloadProcessedImage);
+            
+            function handleFile(file) {
+                // Reset any previous errors
+                bgErrorMessage.style.display = 'none';
+                
+                if (!file.type.match('image.*')) {
+                    showBgError('Please select an image file (JPEG, PNG, etc.)');
+                    return;
+                }
+                
+                // Check file size (10MB limit)
+                if (file.size > 10 * 1024 * 1024) {
+                    showBgError('File size too large. Maximum 10MB allowed.');
+                    return;
+                }
+                
+                selectedFile = file;
+                
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    originalPreview.src = e.target.result;
+                    removeBgBtn.disabled = false;
+                    resetBgBtn.disabled = false;
+                    bgPreviewArea.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            function showBgError(message) {
+                bgErrorMessage.textContent = message;
+                bgErrorMessage.style.display = 'block';
+            }
+            
+            async function removeBackground() {
+                // Show loading state
+                bgLoading.style.display = 'block';
+                removeBgBtn.disabled = true;
+                bgErrorMessage.style.display = 'none';
+                
+                try {
+                    // Create FormData
+                    const formData = new FormData();
+                    formData.append('image_file', selectedFile);
+                    formData.append('size', 'auto');
+                    
+                    let lastError = null;
+                    
+                    // Try each API key until one works
+                    for (const apiKey of bgApiKeys) {
+                        try {
+                            // Make API request to Remove.bg
+                            const response = await fetch('https://api.remove.bg/v1.0/removebg', {
+                                method: 'POST',
+                                headers: {
+                                    'X-Api-Key': apiKey
+                                },
+                                body: formData
+                            });
+                            
+                            if (!response.ok) {
+                                const errorData = await response.json();
+                                lastError = errorData.errors ? errorData.errors[0].title : 'API request failed';
+                                continue; // Try next API key
+                            }
+                            
+                            // Get the result as blob
+                            const blob = await response.blob();
+                            
+                            if (blob.size === 0) {
+                                lastError = 'Received empty response from API';
+                                continue; // Try next API key
+                            }
+                            
+                            processedImageUrl = URL.createObjectURL(blob);
+                            
+                            // Display result
+                            processedPreview.src = processedImageUrl;
+                            
+                            // Show preview area
+                            bgPreviewArea.style.display = 'flex';
+                            bgLoading.style.display = 'none';
+                            return; // Success, exit the function
+                        } catch (error) {
+                            lastError = error.message;
+                            continue; // Try next API key
+                        }
+                    }
+                    
+                    // If we get here, all API keys failed
+                    throw new Error(`All API keys failed. Last error: ${lastError}`);
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    showBgError(`Background removal failed: ${error.message}`);
+                    bgLoading.style.display = 'none';
+                    removeBgBtn.disabled = false;
+                }
+            }
+            
+            function resetBgRemover() {
+                selectedFile = null;
+                fileInput.value = '';
+                originalPreview.src = '';
+                processedPreview.src = '';
+                removeBgBtn.disabled = true;
+                resetBgBtn.disabled = true;
+                bgPreviewArea.style.display = 'none';
+                bgErrorMessage.style.display = 'none';
+                
+                if (processedImageUrl) {
+                    URL.revokeObjectURL(processedImageUrl);
+                    processedImageUrl = null;
+                }
+            }
+            
+            function downloadProcessedImage() {
+                if (processedImageUrl) {
+                    const a = document.createElement('a');
+                    a.href = processedImageUrl;
+                    a.download = `background-removed-${Date.now()}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }
+            }
+        }
+        
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random properties
+                const size = Math.random() * 3 + 1;
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                const delay = Math.random() * 5;
+                const duration = Math.random() * 10 + 10;
+                const opacity = Math.random() * 0.5 + 0.1;
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}%`;
+                particle.style.top = `${posY}%`;
+                particle.style.opacity = opacity;
+                particle.style.animation = `floatParticle ${duration}s infinite ${delay}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+            
+            // Add animation for particles
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes floatParticle {
+                    0% { transform: translate(0, 0); }
+                    25% { transform: translate(20px, 20px); }
+                    50% { transform: translate(0, 40px); }
+                    75% { transform: translate(-20px, 20px); }
+                    100% { transform: translate(0, 0); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // Load models into the models section
+        function loadModels() {
+            const modelsContainer = document.getElementById('models-container');
+            modelsContainer.innerHTML = '';
+            
+            for (const [id, model] of Object.entries(models)) {
+                const modelCard = document.createElement('div');
+                modelCard.className = 'model-card';
+                modelCard.dataset.modelId = id;
+                modelCard.innerHTML = `
+                    <h3>${model.displayName}</h3>
+                    <p>${model.description}</p>
+                    <div class="model-stats">
+                        <div class="model-stat">
+                            <span>RPM</span>
+                            <span class="stat-value">${model.rpm}</span>
+                        </div>
+                        <div class="model-stat">
+                            <span>RPD</span>
+                            <span class="stat-value">${model.rpd}</span>
+                        </div>
+                        <div class="model-stat">
+                            <span>TPM</span>
+                            <span class="stat-value">${model.tpm}</span>
+                        </div>
+                        <div class="model-stat">
+                            <span>TPD</span>
+                            <span class="stat-value">${model.tpd}</span>
+                        </div>
+                    </div>
+                `;
+                
+                modelCard.addEventListener('click', () => {
+                    selectModel(id);
+                });
+                
+                modelsContainer.appendChild(modelCard);
+            }
+        }
+        
+        // Select a model
+        function selectModel(modelId) {
+            currentModel = modelId;
+            const model = models[modelId];
+            
+            // Update status bar
+            document.getElementById('model-info').textContent = `Model: ${model.displayName} | v2.4.1`;
+            
+            // Show confirmation
+            addMessageToChat('system', `Model switched to ${model.displayName}`);
+        }
+        
+        // Setup navigation between sections
+        function setupNavigation() {
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    // Remove active class from all items
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    
+                    // Add active class to clicked item
+                    item.classList.add('active');
+                    
+                    // Get section to show
+                    const sectionId = item.dataset.section;
+                    
+                    // Hide all sections
+                    document.querySelectorAll('.content-section').forEach(section => {
+                        section.classList.remove('active');
+                    });
+                    
+                    // Show selected section
+                    document.getElementById(sectionId).classList.add('active');
+                });
+            });
+        }
+        
+        // Setup chat functionality
+        function setupChat() {
+            const sendButton = document.getElementById('send-button');
+            const userInput = document.getElementById('user-input');
+            
+            sendButton.addEventListener('click', sendMessage);
+            
+            userInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        }
+        
+        // Send message to AI
+        async function sendMessage() {
+            const userInput = document.getElementById('user-input');
+            const message = userInput.value.trim();
+            
+            if (!message) return;
+            
+            // Clear input
+            userInput.value = '';
+            
+            // Add user message to chat
+            addMessageToChat('user', message);
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            // Call the actual Groq API
+            try {
+                if (!currentModel) {
+                    throw new Error('No model selected. Please select a model first.');
+                }
+                
+                if (!apiKey) {
+                    throw new Error('API key not configured. Please enter your Groq API key in Settings.');
+                }
+                
+                const response = await callGroqAPI(message);
+                
+                // Hide typing indicator
+                hideTypingIndicator();
+                
+                // Add AI response to chat
+                addMessageToChat('ai', response);
+                
+                // Save to chat history
+                saveToHistory(message, response);
+                
+                // Increment message count and update graph
+                messageCount++;
+                updateUsageGraph(document.querySelector('.time-period-btn.active').dataset.period);
+                
+                // Save to Firestore if signed in
+                if (auth.currentUser) {
+                    await saveUserData(auth.currentUser.uid, {
+                        messageCount: messageCount,
+                        chatHistory: arrayUnion({
+                            user: message,
+                            ai: response,
+                            timestamp: new Date().toISOString(),
+                            model: currentModel
+                        })
+                    });
+                }
+                
+            } catch (error) {
+                // Hide typing indicator
+                hideTypingIndicator();
+                
+                // Show error message
+                addMessageToChat('system', `Error: ${error.message}`);
+            }
+        }
+        
+        // Call Groq API
+        async function callGroqAPI(message) {
+            const endpoint = 'https://api.groq.com/openai/v1/chat/completions';
+            
+            // Prepare messages with memory instructions
+            const messages = [];
+            
+            if (memoryInstructions) {
+                messages.push({
+                    role: 'system',
+                    content: memoryInstructions
+                });
+            }
+            
+            // Handle both string messages and message arrays
+            if (typeof message === 'string') {
+                messages.push({
+                    role: 'user',
+                    content: message
+                });
+            } else if (Array.isArray(message)) {
+                // If it's already an array of messages, use it directly
+                messages.push(...message);
+            }
+            
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: currentModel,
+                    messages: messages,
+                    temperature: 0.7,
+                    max_tokens: 2048
+                })
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error?.message || 'API request failed');
+            }
+            
+            const data = await response.json();
+            return data.choices[0].message.content;
+        }
+        
+        // Add message to chat
+        function addMessageToChat(sender, message) {
+            const chatMessages = document.getElementById('chat-messages');
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${sender}-message`;
+            
+            if (sender === 'user') {
+                messageDiv.innerHTML = `
+                    <div class="user-message">${message}</div>
+                `;
+            } else if (sender === 'ai') {
+                // Process AI message formatting
+                const processedMessage = formatAIMessage(message);
+                messageDiv.innerHTML = `
+                    <div class="ai-message">${processedMessage}</div>
+                `;
+            } else if (sender === 'system') {
+                messageDiv.innerHTML = `
+                    <div class="ai-message" style="color: var(--accent);">${message}</div>
+                `;
+            }
+            
+            chatMessages.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Format AI message with special formatting
+        function formatAIMessage(message) {
+            // Replace ** with bold
+            message = message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+            // Replace * with italics
+            message = message.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            
+            // Handle code blocks
+            message = message.replace(/```([a-z]*)\n([\s\S]*?)\n```/g, function(match, lang, code) {
+                return `<pre><code class="language-${lang}">${code}</code></pre>`;
+            });
+            
+            // Handle single backticks
+            message = message.replace(/`([^`]+)`/g, '<code>$1</code>');
+            
+            // Handle <think> tags (make invisible to user but show "Thinking")
+            message = message.replace(/<think>(.*?)<\/think>/g, (match, p1) => {
+                return `<span class="thinking-indicator">Thinking...</span>`;
+            });
+            
+            // Replace - at start of line with bullet points
+            message = message.replace(/^- (.*$)/gm, '<li>$1</li>');
+            
+            // Replace numbered lists
+            message = message.replace(/^(\d+)\. (.*$)/gm, '<li>$2</li>');
+            
+            // Wrap lines starting with li in ul tags
+            message = message.replace(/(<li>.*<\/li>)+/g, function(match) {
+                return `<ul>${match}</ul>`;
+            });
+            
+            return message;
+        }
+        
+        // Show typing indicator
+        function showTypingIndicator() {
+            const chatMessages = document.getElementById('chat-messages');
+            
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.id = 'current-typing-indicator';
+            typingDiv.innerHTML = `
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            `;
+            
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Hide typing indicator
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('current-typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+        
+        // Save conversation to history
+        function saveToHistory(userMessage, aiResponse) {
+            chatHistory.push({
+                user: userMessage,
+                ai: aiResponse,
+                timestamp: new Date().toISOString(),
+                model: currentModel
+            });
+            
+            // Save to localStorage
+            localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+        }
+        
+        // Setup memory functionality
+        function setupMemory() {
+            const saveButton = document.getElementById('save-memory');
+            const memoryText = document.getElementById('memory-text');
+            
+            // Load saved memory if available
+            if (localStorage.getItem('aiMemory')) {
+                memoryInstructions = localStorage.getItem('aiMemory');
+                memoryText.value = memoryInstructions;
+            }
+            
+            saveButton.addEventListener('click', async () => {
+                memoryInstructions = memoryText.value;
+                localStorage.setItem('aiMemory', memoryInstructions);
+                
+                // Save to Firestore if signed in
+                if (auth.currentUser) {
+                    await saveUserData(auth.currentUser.uid, {
+                        memoryInstructions: memoryInstructions
+                    });
+                }
+                
+                // Show confirmation
+                addMessageToChat('system', 'Memory instructions updated successfully');
+            });
+        }
+        
+        // Setup API key functionality
+        function setupApiKey() {
+            const saveButton = document.getElementById('save-api-key');
+            const groqApiKeyInput = document.getElementById('groq-api-key');
+            const hfApiKeyInput = document.getElementById('hf-api-key');
+            
+            // Load saved API keys if available
+            if (apiKey) {
+                groqApiKeyInput.value = apiKey;
+            }
+            if (hfApiKey) {
+                hfApiKeyInput.value = hfApiKey;
+            }
+            
+            saveButton.addEventListener('click', async () => {
+                apiKey = groqApiKeyInput.value.trim();
+                hfApiKey = hfApiKeyInput.value.trim();
+                
+                localStorage.setItem('groqApiKey', apiKey);
+                localStorage.setItem('hfApiKey', hfApiKey);
+                
+                // Save to Firestore if signed in
+                if (auth.currentUser) {
+                    await saveUserData(auth.currentUser.uid, {
+                        groqApiKey: apiKey,
+                        hfApiKey: hfApiKey
+                    });
+                }
+                
+                // Update status
+                updateApiStatus();
+                
+                // Show confirmation
+                addMessageToChat('system', 'API keys saved successfully');
+            });
+        }
+        
+        // Update API connection status
+        function updateApiStatus() {
+            const statusText = document.getElementById('api-status-text');
+            const statusIndicator = document.querySelector('.status-indicator');
+            
+            if (apiKey) {
+                statusText.textContent = 'GROQ API: Connected';
+                statusIndicator.style.background = 'var(--success)';
+                statusIndicator.style.boxShadow = '0 0 10px var(--success)';
+            } else {
+                statusText.textContent = 'GROQ API: Not Connected';
+                statusIndicator.style.background = 'var(--error)';
+                statusIndicator.style.boxShadow = '0 0 10px var(--error)';
+            }
+        }
+        
+        // Setup API usage section
+        function setupApiUsage() {
+            // Time period selector
+            const periodButtons = document.querySelectorAll('.time-period-btn');
+            periodButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    periodButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    updateUsageGraph(btn.dataset.period);
+                });
+            });
+            
+            // Initial graph
+            updateUsageGraph('24h');
+        }
+        
+        // Update usage graph
+        function updateUsageGraph(period) {
+            const graph = document.getElementById('usage-graph');
+            graph.innerHTML = '';
+            
+            // Sample data - in a real app, you would get this from your API
+            let labels = [];
+            let values = [];
+            let maxValue = 100;
+            
+            if (period === '24h') {
+                labels = ['12AM', '3AM', '6AM', '9AM', '12PM', '3PM', '6PM', '9PM'];
+                values = [messageCount/8, messageCount/7, messageCount/6, messageCount/5, messageCount/4, messageCount/3, messageCount/2, messageCount];
+                maxValue = messageCount > 0 ? messageCount * 1.2 : 100;
+            } else if (period === '7d') {
+                labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                values = [messageCount/7, messageCount/6, messageCount/5, messageCount/4, messageCount/3, messageCount/2, messageCount];
+                maxValue = messageCount > 0 ? messageCount * 1.2 : 100;
+            } else if (period === '30d') {
+                labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                values = [messageCount/4, messageCount/3, messageCount/2, messageCount];
+                maxValue = messageCount > 0 ? messageCount * 1.2 : 100;
+            }
+            
+            // Create bars
+            values.forEach((value, index) => {
+                const barHeight = (value / maxValue) * 100;
+                const bar = document.createElement('div');
+                bar.className = 'graph-bar';
+                bar.style.height = `${barHeight}%`;
+                
+                const valueLabel = document.createElement('div');
+                valueLabel.className = 'graph-bar-value';
+                valueLabel.textContent = Math.round(value);
+                
+                const dayLabel = document.createElement('div');
+                dayLabel.className = 'graph-bar-label';
+                dayLabel.textContent = labels[index];
+                
+                bar.appendChild(valueLabel);
+                bar.appendChild(dayLabel);
+                graph.appendChild(bar);
+            });
+        }
+        
+        // Show sign in modal
+        function showSignInModal() {
+            document.getElementById('signin-modal').style.display = 'flex';
+        }
+        
+        // Hide sign in modal
+        function hideSignInModal() {
+            document.getElementById('signin-modal').style.display = 'none';
+        }
+        
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+        
+        // Close modal button
+        document.getElementById('close-signin').addEventListener('click', hideSignInModal);
+        
+        // Sign in button
+        document.getElementById('signin-btn').addEventListener('click', showSignInModal);
+    </script>
+</body>
+</html>
